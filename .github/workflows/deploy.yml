@@ -16,21 +16,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: "ap-east-1"
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: "ap-east-1"
           
-      - name: Deploy to S3
-        run: |
-          # 同步网站文件到 S3 存储桶
-          aws s3 sync . s3://mytvbprojectbucket-1 \
-            --exclude ".git/*" \
-            --exclude ".gitignore" \
-            --exclude ".github/*" \
-            --delete  # 删除 S3 上不存在于本地的文件
+      # - name: Deploy to S3
+      #   run: |
+      #     # 同步网站文件到 S3 存储桶
+      #     aws s3 sync . s3://mytvbprojectbucket-1 \
+      #       --exclude ".git/*" \
+      #       --exclude ".gitignore" \
+      #       --exclude ".github/*" \
+      #       --delete  # 删除 S3 上不存在于本地的文件
 
       - name: Debug Secrets
         run: |
