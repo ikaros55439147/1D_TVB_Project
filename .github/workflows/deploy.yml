@@ -2,8 +2,8 @@ name: Deploy to AWS
 
 on:
   push:
-    branches: [ main ]  # 只在 main 分支推送时触发
-  # 如果需要在 PR 合并时部署，可以添加：
+    branches: [ main ]
+  # 如果需要 PR 合并时触发：
   # pull_request:
   #   types: [closed]
   #   branches: [ main ]
@@ -21,16 +21,18 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: "ap-east-1"
+          aws-region: ${{ secrets.AWS_REGION }}  # 使用 GitHub Secret 存储 AWS Region
           
-      - name: Deploy to S3
+      - name: Download files from source S3 bucket
         run: |
-          # 同步网站文件到 S3 存储桶
-          aws s3 sync . s3://mytvbprojectbucket-1 \
+          # 从另一个 S3 存储桶下载文件
+          aws s3 sync s3://${{ secrets.S3_BUCKET_OJ_NAME }}/ ./workspaces/1D_TVB_Project/app/images
+          
+      - name: Deploy to target S3 bucket
+        run: |
+          # 同步文件到目标 S3 存储桶
+          aws s3 sync . s3://${{ secrets.S3_BUCKET_NAME }} \
             --exclude ".git/*" \
             --exclude ".gitignore" \
             --exclude ".github/*" \
-            --delete  # 删除 S3 上不存在于本地的文件
-
-      
-          
+            --delete
