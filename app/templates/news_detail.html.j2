@@ -1,0 +1,108 @@
+{% extends "base.html.j2" %}
+
+{% block content %}
+<div class="news-detail-container">
+    <div class="row">
+        <!-- 主內容區 -->
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('news') }}">無線新聞</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ news.title }}</li>
+                </ol>
+            </nav>
+            
+            <article class="news-article">
+                <h1 class="article-title">{{ news.title }}</h1>
+                
+                <div class="article-meta mb-3">
+                    <span class="badge badge-primary">{{ news.category.name }}</span>
+                    <span class="text-muted ml-2">發佈時間: {{ news.publish_time|datetimeformat }}</span>
+                    <span class="text-muted ml-2">瀏覽量: {{ news.views }}</span>
+                </div>
+                
+                {% if news.cover_image %}
+                <div class="article-cover mb-4">
+                    <img src="{{ news.cover_image }}" class="img-fluid rounded" alt="{{ news.title }}">
+                </div>
+                {% endif %}
+                
+                <div class="article-content">
+                    {{ news.content|safe }}
+                </div>
+                
+                <!-- 分享按鈕 -->
+                <div class="article-share mt-4 pt-3 border-top">
+                    <h5>分享這則新聞:</h5>
+                    <div class="share-buttons">
+                        <a href="#" class="btn btn-sm btn-outline-secondary mr-2"><i class="fab fa-facebook-f"></i> Facebook</a>
+                        <a href="#" class="btn btn-sm btn-outline-secondary mr-2"><i class="fab fa-twitter"></i> Twitter</a>
+                        <a href="#" class="btn btn-sm btn-outline-secondary mr-2"><i class="fab fa-weibo"></i> 微博</a>
+                        <a href="#" class="btn btn-sm btn-outline-secondary"><i class="fas fa-envelope"></i> 郵件</a>
+                    </div>
+                </div>
+            </article>
+            
+            <!-- 相關新聞 -->
+            {% if related_news %}
+            <section class="related-news mt-5 pt-4 border-top">
+                <h4 class="mb-4">相關新聞</h4>
+                <div class="row">
+                    {% for item in related_news %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <img src="{{ item.cover_image or url_for('static', filename='images/news-default.jpg') }}" 
+                                 class="card-img-top" alt="{{ item.title }}">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="{{ url_for('news_detail', id=item.id) }}">{{ item.title }}</a>
+                                </h5>
+                                <p class="card-text text-muted">{{ item.publish_time|datetimeformat }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+        </div>
+        
+        <!-- 側邊欄 -->
+        <div class="col-md-4">
+            <!-- 熱門新聞 -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">熱門新聞</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for item in News.query.order_by(News.views.desc()).limit(5).all() %}
+                    <a href="{{ url_for('news_detail', id=item.id) }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ item.title }}</h6>
+                            <small>{{ item.views }} 瀏覽</small>
+                        </div>
+                        <small class="text-muted">{{ item.publish_time|datetimeformat }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- 新聞訂閱 -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">訂閱新聞</h5>
+                </div>
+                <div class="card-body">
+                    <p>訂閱我們的電子報，獲取最新新聞推送</p>
+                    <form>
+                        <div class="form-group">
+                            <input type="email" class="form-control" placeholder="您的電子郵件">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">訂閱</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,407 @@
+{% extends "base.html.j2" %}
+
+{% block styles %}
+    {{ super() }}
+    <style>
+        /* 慈善頁面專用樣式 */
+        .charity-page {
+            background-color: #f8f9fa;
+            padding-bottom: 2rem;
+        }
+        
+        /* 英雄橫幅 */
+        .hero-banner {
+            position: relative;
+            margin-bottom: 3rem;
+        }
+        
+        .hero-image-container {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-image-container img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            filter: brightness(0.7);
+        }
+        
+        .hero-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            width: 100%;
+            padding: 0 1rem;
+        }
+        
+        .hero-text h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .hero-text p {
+            font-size: 1.5rem;
+            margin-bottom: 0;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        
+        /* 區塊標題 */
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+            position: relative;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background-color: #d9230f;
+        }
+        
+        /* 愛心卡片 */
+        .charity-card {
+            border: none;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+        }
+        
+        .charity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card-image-container {
+            position: relative;
+            overflow: hidden;
+            padding-top: 56.25%; /* 16:9 比例 */
+        }
+        
+        .card-img-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .charity-card:hover .card-img-top {
+            transform: scale(1.05);
+        }
+        
+        .card-body {
+            padding: 1.25rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #333;
+            flex-grow: 1;
+        }
+        
+        .card-meta {
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+        
+        .activity-badge {
+            background-color: #d9230f;
+            color: white;
+            font-weight: 500;
+        }
+        
+        /* 資源卡片 */
+        .resource-card {
+            border: none;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            text-align: center;
+            padding: 1.5rem;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card-icon {
+            margin-bottom: 1rem;
+            color: #d9230f;
+        }
+        
+        .resource-card .card-title {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* 查看更多按鈕 */
+        .see-more-btn {
+            border-radius: 20px;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            border: 1px solid #d9230f;
+            color: #d9230f;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .see-more-btn:hover {
+            background-color: #d9230f;
+            color: white;
+            transform: translateX(5px);
+            text-decoration: none;
+        }
+        
+        .see-more-btn i {
+            margin-left: 0.3rem;
+            transition: transform 0.3s;
+        }
+        
+        .see-more-btn:hover i {
+            transform: translateX(3px);
+        }
+        
+        /* 下載按鈕 */
+        .download-btn {
+            border-radius: 20px;
+            padding: 0.4rem 1.25rem;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        /* 響應式調整 */
+        @media (max-width: 1200px) {
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-text p {
+                font-size: 1.3rem;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .hero-image-container img {
+                height: 350px;
+            }
+            
+            .hero-text h1 {
+                font-size: 2.2rem;
+            }
+            
+            .section-title {
+                font-size: 1.6rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-image-container img {
+                height: 300px;
+            }
+            
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-text p {
+                font-size: 1.1rem;
+            }
+            
+            .section-title {
+                font-size: 1.4rem;
+            }
+            
+            .see-more-btn {
+                padding: 0.4rem 1.25rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-image-container img {
+                height: 250px;
+            }
+            
+            .hero-text h1 {
+                font-size: 1.8rem;
+            }
+            
+            .hero-text p {
+                font-size: 1rem;
+            }
+            
+            .section-title {
+                font-size: 1.3rem;
+            }
+            
+            .card-title {
+                font-size: 1rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block app_content %}
+<div class="charity-page">
+    <!-- 頂部大圖 -->
+    <section class="hero-banner mb-5">
+        <div class="hero-image-container">
+            <img src="https://via.placeholder.com/1200x400?text=TVB愛心基金" class="img-fluid w-100" alt="TVB愛心基金" loading="eager">
+            <div class="hero-text">
+                <h1>TVB愛心基金</h1>
+                <p>關愛社會，攜手同行</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 主要內容區 -->
+    <div class="container">
+        <!-- 活動消息板塊 -->
+        <section class="activity-section mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="section-title">活動消息</h2>
+                <a href="{{ url_for('charity_activities') }}" class="see-more-btn btn btn-outline-primary">
+                    查看更多 <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+            
+            <div class="row">
+                <!-- 第一排 - 2個內容 -->
+                {% for i in range(2) %}
+                <div class="col-md-6 mb-4">
+                    <div class="charity-card h-100">
+                        <div class="card-image-container">
+                            <img src="https://via.placeholder.com/600x400?text=活動{{ i+1 }}" class="card-img-top" alt="活動{{ i+1 }}" loading="lazy">
+                        </div>
+                        
+                        <div class="card-body">
+                            <h5 class="card-title">愛心基金活動 {{ i+1 }}</h5>
+                            <div class="card-meta">
+                                <span class="badge activity-badge">活動消息</span>
+                                <small class="text-muted">{{ [1,2,3,4,5]|random }}天前</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="row">
+                <!-- 第二排 - 3個內容 -->
+                {% for i in range(2,5) %}
+                <div class="col-md-4 mb-4">
+                    <div class="charity-card h-100">
+                        <div class="card-image-container">
+                            <img src="https://via.placeholder.com/400x300?text=活動{{ i+1 }}" class="card-img-top" alt="活動{{ i+1 }}" loading="lazy">
+                        </div>
+                        
+                        <div class="card-body">
+                            <h5 class="card-title">愛心基金活動 {{ i+1 }}</h5>
+                            <div class="card-meta">
+                                <span class="badge activity-badge">活動消息</span>
+                                <small class="text-muted">{{ [1,2,3,4,5]|random }}天前</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="row">
+                <!-- 第三排 - 3個內容 -->
+                {% for i in range(5,8) %}
+                <div class="col-md-4 mb-4">
+                    <div class="charity-card h-100">
+                        <div class="card-image-container">
+                            <img src="https://via.placeholder.com/400x300?text=活動{{ i+1 }}" class="card-img-top" alt="活動{{ i+1 }}" loading="lazy">
+                        </div>
+                        
+                        <div class="card-body">
+                            <h5 class="card-title">愛心基金活動 {{ i+1 }}</h5>
+                            <div class="card-meta">
+                                <span class="badge activity-badge">活動消息</span>
+                                <small class="text-muted">{{ [1,2,3,4,5]|random }}天前</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- 資料中心板塊 -->
+        <section class="resource-section">
+            <h2 class="section-title mb-4">資料中心</h2>
+            
+            <div class="row">
+                {% for i in range(4) %}
+                <div class="col-md-3 mb-4">
+                    <div class="resource-card h-100">
+                        <div class="card-icon text-center py-3">
+                            <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                        </div>
+                        <div class="card-body text-center">
+                            <h5 class="card-title">愛心基金文件 {{ i+1 }}</h5>
+                            <div class="card-meta">
+                                <small class="text-muted">PDF • {{ [1,2,3]|random }}MB</small>
+                            </div>
+                            <a href="#" class="btn btn-outline-primary mt-2 download-btn">下載 <i class="bi bi-download"></i></a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 卡片點擊效果
+        document.querySelectorAll('.charity-card').forEach(card => {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', function() {
+                // 這裡可以添加點擊後的導航邏輯
+                console.log('Card clicked:', this.querySelector('.card-title').textContent);
+            });
+        });
+    });
+    </script>
+{% endblock %}

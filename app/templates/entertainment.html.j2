@@ -1,0 +1,569 @@
+{% extends "base.html.j2" %}
+
+{% block styles %}
+    {{ super() }}
+    <style>
+    /* 輪播進度條樣式 */
+
+/* 確保非活動輪播項目隱藏 */
+.carousel-item:not(.active) {
+    display: none;
+}
+
+
+.carousel-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: rgba(255,255,255,0.2);
+  z-index: 10;
+}
+
+.carousel-progress .progress-bar {
+  height: 100%;
+  background-color: white;
+  width: 0%;
+}
+
+/* 平滑過渡效果 */
+.carousel-inner.smooth-transition .carousel-item {
+  transition: transform 0.6s ease-in-out;
+}
+    /* 主輪播樣式 */
+    .carousel {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+    .carousel-item {
+  transition: transform 0.6s ease-in-out; /* 更平滑的過渡效果 */
+}
+
+.carousel-item img {
+  object-fit: cover;
+  filter: brightness(0.95);
+  height: 500px; /* 固定高度 */
+  width: 100%;
+}
+
+    .carousel-caption {
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  padding: 2rem;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: left;
+  transition: all 0.3s ease;
+  opacity: 0.9;
+}
+
+.carousel-caption:hover {
+  opacity: 1;
+  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+}
+
+.carousel-caption p {
+  font-size: 1.1rem;
+  max-width: 80%;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    z-index: 20;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.carousel-control-prev {
+    left: 20px;
+    right: auto;
+}
+
+.carousel-control-next {
+    right: 20px;
+    left: auto;
+}
+
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  opacity: 0.9; /* 懸停時稍微增加不透明度 */
+  background-color: rgba(0, 0, 0, 0.5); /* 懸停時背景加深 */
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  width: 30px;
+  height: 30px;
+  background-size: 100% 100%;
+  filter: brightness(0) invert(1); /* 確保圖標為白色 */
+}
+
+
+.carousel-indicators {
+  bottom: 20px;
+}
+
+.carousel-indicators button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 6px;
+  border: 2px solid white;
+  background: transparent;
+  opacity: 0.7;
+  transition: all 0.3s;
+}
+
+.carousel-indicators button.active {
+  background: white;
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+    .carousel-caption h2 {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+/* 觸摸設備優化 */
+@media (hover: none) {
+  .carousel-control-prev,
+  .carousel-control-next {
+    opacity: 0.9;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* 響應式調整 */
+@media (max-width: 576px) {
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .carousel-control-prev {
+    left: 10px;
+  }
+  
+  .carousel-control-next {
+    right: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .carousel-item img {
+    height: 250px;
+  }
+  
+  .carousel-caption {
+    padding: 1rem;
+  }
+  
+  .carousel-caption h2 {
+    font-size: 1.5rem;
+  }
+  
+  .carousel-control-prev, 
+  .carousel-control-next {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+    /* 區塊樣式 */
+    .section {
+        margin: 25px 0;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border: 1px solid #eee;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .section-title a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .section-title a:hover {
+        color: #d9230f;
+    }
+
+    .see-more {
+        color: #d9230f;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+
+    .see-more:hover {
+        text-decoration: underline;
+        transform: translateX(3px);
+    }
+
+    /* 節目列表 */
+    .program-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 10px;
+    }
+
+    .program-item {
+        flex: 1 1 calc(33.333% - 15px);
+        min-width: 200px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 1px solid #eaeaea;
+    }
+
+    .program-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .program-item img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .program-item-content {
+        padding: 12px;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    /* 導航按鈕 */
+    .buttons {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .nav-button {
+        width: 36px;
+        height: 36px;
+        margin: 0;
+        border-radius: 50%;
+        background-color: #f1f1f1;
+        color: #333;
+        border: none;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .nav-button:hover {
+        background-color: #d9230f;
+        color: white;
+    }
+
+    .nav-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background-color: #f1f1f1;
+        color: #999;
+    }
+
+    .page-indicator {
+        font-size: 0.9rem;
+        color: #666;
+        min-width: 40px;
+        text-align: center;
+    }
+    
+
+    /* 新聞列表 */
+    .news-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .news-item {
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .news-item:last-child {
+        border-bottom: none;
+    }
+
+    .news-item a {
+        color: #333;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .news-item a:hover {
+        color: #d9230f;
+    }
+
+    .news-time {
+        font-size: 0.8rem;
+        color: #777;
+        display: block;
+        margin-top: 3px;
+    }
+
+    /* 響應式調整 */
+    @media (max-width: 992px) {
+        .program-item {
+            flex: 1 1 calc(50% - 15px);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .carousel-item {
+            height: 350px;
+        }
+        
+        .carousel-caption h2 {
+            font-size: 1.8rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .carousel-item {
+            height: 300px;
+        }
+        
+        .program-item {
+            flex: 1 1 100%;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+        }
+    }
+    </style>
+{% endblock styles %}
+
+{% block app_content %}
+<div class="entertainment-page">
+    <!-- 輪播圖 -->
+    <section class="carousel-section mb-5">
+        <div id="entertainmentCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                {% for item in entertainment_carousel_items %}
+                <button type="button"
+                            data-bs-target="#mainCarousel"
+                            data-bs-slide-to="{{ loop.index0 }}"
+                            {% if item.active %}class="active"{% endif %}></button>
+                {% endfor %}
+            </div>
+            <div class="carousel-inner">
+                {% for item in entertainment_carousel_items %}
+                <div class="carousel-item {% if loop.first %}active{% endif %}">
+                    <img src="{{ url_for('static', filename='app/images/' + item.image) }}" class="d-block w-100" alt="{{ item.title }}"onerror="this.src='https://via.placeholder.com/800x400'">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h2>{{ item.title }}</h2>
+                        <p>{{ item.description }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#entertainmentCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">上一頁</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#entertainmentCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">下一頁</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- 娛樂板塊 -->
+    <div class="container">
+        {% for category in ['戲劇', '藝人動態', '綜藝', 'TVB Plus', '生活', '最新消息'] %}
+        <section class="entertainment-category mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="category-title">{{ category }}</h2>
+                <a href="{{ url_for('category_detail', category_name=category) }}" class="see-more-btn btn btn-outline-primary">
+                    查看更多 <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+            
+            <div class="row">
+                {% for i in range(4) %}
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="entertainment-card h-100">
+                        <!-- 圖片部分 -->
+                        <div class="card-image-container">
+                            <img src="https://via.placeholder.com/300x200?text={{ category }}{{ i+1 }}" class="card-img-top h-100 w-100 object-fit-cover" alt="{{ category }}圖片{{ i+1 }}">
+                        </div>
+                        
+                        <div class="card-body">
+                            <!-- 標題部分 -->
+                            <h5 class="card-title">{{ category }}標題 {{ i+1 }}</h5>
+                            
+                            <!-- 板塊和時間部分 -->
+                            <div class="card-meta d-flex justify-content-between align-items-center">
+                                <span class="badge bg-secondary">{{ category }}</span>
+                                <small class="text-muted">{{ [1,2,3,4,5,6]|random }}小時前</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 輪播圖增強功能
+        const carousel = document.getElementById('mainCarousel');
+        if (carousel) {
+            const carouselInstance = new bootstrap.Carousel(carousel, {
+                interval: 5000, // 5秒切換
+                pause: 'hover', // 鼠標懸停暫停
+                wrap: true, // 循環播放
+                touch: true // 啟用觸摸支持
+            });
+            
+            // 添加鍵盤導航支持
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft') {
+                    carouselInstance.prev();
+                } else if (e.key === 'ArrowRight') {
+                    carouselInstance.next();
+                }
+            });
+            
+            // 點擊指示器時平滑滾動
+            const indicators = carousel.querySelectorAll('.carousel-indicators button');
+            indicators.forEach(indicator => {
+                indicator.addEventListener('click', function() {
+                    // 添加平滑過渡類
+                    carousel.querySelector('.carousel-inner').classList.add('smooth-transition');
+                    
+                    // 過渡完成後移除類
+                    setTimeout(() => {
+                        carousel.querySelector('.carousel-inner').classList.remove('smooth-transition');
+                    }, 600);
+                });
+            });
+            
+            // 添加輪播進度條
+            const progressBar = document.createElement('div');
+            progressBar.className = 'carousel-progress';
+            progressBar.innerHTML = '<div class="progress-bar"></div>';
+            carousel.appendChild(progressBar);
+            
+            // 更新進度條
+            let progressInterval;
+            function startProgress() {
+                clearInterval(progressInterval);
+                const progressBarInner = progressBar.querySelector('.progress-bar');
+                progressBarInner.style.width = '0%';
+                progressBarInner.style.transition = 'none';
+                progressBarInner.offsetHeight; // 觸發重繪
+                
+                let width = 0;
+                const duration = 5000; // 與輪播間隔一致
+                const increment = 100 / (duration / 50);
+                
+                progressBarInner.style.transition = `width ${duration}ms linear`;
+                progressBarInner.style.width = '100%';
+            }
+            
+            carousel.addEventListener('slid.bs.carousel', startProgress);
+            startProgress();
+        }
+        
+        // 通用節目列表導航功能
+        function setupSectionNavigation(sectionId) {
+            const prevBtn = document.querySelector(`.prev-button[data-section="${sectionId}"]`);
+            const nextBtn = document.querySelector(`.next-button[data-section="${sectionId}"]`);
+            const pageIndicator = document.querySelector(`.page-indicator[data-section="${sectionId}"]`);
+            const items = document.querySelectorAll(`.program-item[data-section="${sectionId}"]`);
+            
+            if (!prevBtn || !nextBtn || !pageIndicator || items.length === 0) return;
+            
+            // 計算總組數
+            const groups = new Set();
+            items.forEach(item => groups.add(parseInt(item.dataset.group)));
+            const totalGroups = groups.size;
+            
+            let currentGroup = 1;
+            
+            function updateNavigation() {
+                // 更新顯示狀態
+                items.forEach(item => {
+                    item.style.display = parseInt(item.dataset.group) === currentGroup ? 'block' : 'none';
+                });
+                
+                // 更新頁面指示器
+                pageIndicator.textContent = `${currentGroup}/${totalGroups}`;
+                
+                // 更新按鈕狀態
+                prevBtn.disabled = currentGroup === 1;
+                nextBtn.disabled = currentGroup === totalGroups;
+            }
+            
+            // 上一組
+            prevBtn.addEventListener('click', () => {
+                if (currentGroup > 1) {
+                    currentGroup--;
+                    updateNavigation();
+                }
+            });
+            
+            // 下一組
+            nextBtn.addEventListener('click', () => {
+                if (currentGroup < totalGroups) {
+                    currentGroup++;
+                    updateNavigation();
+                }
+            });
+            
+            // 初始化
+            updateNavigation();
+        }
+        
+        // 為所有可導航的板塊設置導航功能
+        const navigableSections = ['entertainment', 'popular', 'summaries', 'pearl', 'pearl930'];
+        navigableSections.forEach(sectionId => setupSectionNavigation(sectionId));
+    });
+    </script>
+{% endblock scripts %}

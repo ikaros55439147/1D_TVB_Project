@@ -90,3 +90,34 @@ class Post(db.Model):
 
     def __repr__(self) -> str:
         return f'<Post {self.body}>'
+    
+class NewsCategory(db.Model):
+    __tablename__ = 'news_category'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+    
+    # 与News模型的关系
+    news = db.relationship('News', backref='category', lazy='dynamic')
+
+class News(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200))
+    content = db.Column(db.Text)
+    summary = db.Column(db.String(300))
+    cover_image = db.Column(db.String(200))
+    publish_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    views = db.Column(db.Integer, default=0)
+    is_featured = db.Column(db.Boolean, default=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('news_category.id'))
+    
+    def increment_views(self):
+        self.views += 1
+        db.session.commit()
+
+class CharityActivity(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200))
+    description = db.Column(db.Text)
+    image_url = db.Column(db.String(300))
+    publish_date = db.Column(db.DateTime, default=datetime.utcnow)
