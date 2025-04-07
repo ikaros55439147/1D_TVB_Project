@@ -1,0 +1,48 @@
+{% extends "index.html.j2" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block styles %}
+{{ super() }}
+    <style>
+    #progress {
+        width: 300px;
+        height: 20px;
+        background: #eee;
+        display: none;
+    }
+    #progress-bar {
+        width: 0%;
+        height: 100%; 
+        background: #4CAF50;
+    }
+    </style>
+{% endblock styles %}
+{% block content %}
+    <h1>上傳文件到 S3</h1>
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <button type="submit">上傳</button>
+    </form>
+    <div id="progress">
+        <div id="progress-bar"">
+        </div>
+    </div>
+{% endblock content %}
+{% block scripts %}
+    <script>
+document.querySelector('form').addEventListener('submit', function(e) {
+  const progressDiv = document.getElementById('progress');
+  const progressBar = document.getElementById('progress-bar');
+  progressDiv.style.display = 'block';
+
+  const xhr = new XMLHttpRequest();
+  xhr.upload.addEventListener('progress', function(e) {
+    const percent = (e.loaded / e.total) * 100;
+    progressBar.style.width = percent + '%';
+  });
+  
+  xhr.open('POST', '/upload', true);
+  xhr.send(new FormData(this));
+  e.preventDefault();
+});
+    </script>
+{% endblock scripts %}

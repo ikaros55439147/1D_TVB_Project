@@ -8,7 +8,7 @@
     "waitFor": "onCreateCommand",
     "postCreateCommand": "",
     "postAttachCommand": {
-      "server": "bash start.sh"
+      "server": "flask --debug run --host=0.0.0.0"
     },
     "portsAttributes": {
       "5000": {

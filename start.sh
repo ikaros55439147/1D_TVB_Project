@@ -8,7 +8,6 @@ pip install flask-wtf
 pip install flask-migrate
 pip install flask-sqlalchemy
 pip install flask-babel==2.0.0
-pip install --upgrade pip
 pip install -U djlint
 pip freeze > requirements.txt
 flask db migrate -m "following"

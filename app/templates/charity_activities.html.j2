@@ -1,0 +1,138 @@
+{% extends "base.html.j2" %}
+
+{% block content %}
+<div class="charity-activities-page">
+    <div class="container">
+        <!-- 标题和返回按钮 -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="page-title">愛心基金活動</h1>
+            <a href="{{ url_for('charity') }}" class="btn btn-outline-secondary">
+                &lt; 返回愛心基金
+            </a>
+        </div>
+        
+        <!-- 活动列表 -->
+        <div class="row">
+            {% for activity in activities %}
+            <div class="col-md-4 mb-4">
+                <div class="activity-card h-100">
+                    <div class="card-image-container">
+                        <img src="{{ activity.image_url or url_for('static', filename='images/default-charity.jpg') }}" 
+                             class="card-img-top" alt="{{ activity.title }}">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ activity.title }}</h5>
+                        <p class="card-text">{{ activity.description|truncate(100) }}</p>
+                        <div class="card-meta d-flex justify-content-between">
+                            <small class="text-muted">{{ activity.publish_date|datetimeformat }}</small>
+                            <a href="{{ url_for('charity_activity_detail', id=activity.id) }}" class="btn btn-sm btn-primary">
+                                查看詳情
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- 分页 -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if pagination.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('charity_activities', page=pagination.prev_num) }}">
+                        上一頁
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for page_num in pagination.iter_pages() %}
+                    {% if page_num %}
+                        <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('charity_activities', page=page_num) }}">
+                                {{ page_num }}
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if pagination.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('charity_activities', page=pagination.next_num) }}">
+                        下一頁
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+.charity-activities-page {
+    padding: 20px 0;
+    background-color: #f9f9f9;
+}
+
+.page-title {
+    color: #333;
+    border-left: 4px solid #e53935;
+    padding-left: 15px;
+}
+
+.activity-card {
+    border: none;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.activity-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.card-image-container {
+    height: 200px;
+    overflow: hidden;
+}
+
+.card-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.activity-card:hover .card-image-container img {
+    transform: scale(1.05);
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.card-text {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.card-meta {
+    font-size: 0.8rem;
+}
+
+</style>
+{% endblock %}

@@ -2,6 +2,7 @@ name: Deploy to AWS
 
 on:
   push:
+
     branches: [ main ]
   # 如果需要 PR 合并时触发：
   # pull_request:
@@ -21,6 +22,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
           aws-region: ${{ secrets.AWS_REGION }}  # 使用 GitHub Secret 存储 AWS Region
           
       - name: Download files from source S3 bucket
@@ -36,3 +38,4 @@ jobs:
             --exclude ".gitignore" \
             --exclude ".github/*" \
             --delete
+

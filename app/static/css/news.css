@@ -1,0 +1,76 @@
+/* 新聞頁面樣式 */
+.news-container {
+    padding: 20px 0;
+}
+
+.page-title {
+    color: #2c3e50;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+}
+
+.news-item {
+    transition: transform 0.3s ease;
+}
+
+.news-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.news-meta {
+    font-size: 0.9rem;
+}
+
+.news-filter {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+/* 新聞詳情頁樣式 */
+.news-detail-container {
+    padding: 20px 0;
+}
+
+.article-title {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.article-meta {
+    font-size: 0.9rem;
+}
+
+.article-cover {
+    margin-bottom: 20px;
+}
+
+.article-content {
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.article-content img {
+    max-width: 100%;
+    height: auto;
+    margin: 15px 0;
+}
+
+.related-news h4 {
+    color: #2c3e50;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+}
+
+/* 響應式調整 */
+@media (max-width: 768px) {
+    .news-item .row {
+        flex-direction: column;
+    }
+    
+    .news-item .col-md-4 {
+        margin-bottom: 15px;
+    }
+}
