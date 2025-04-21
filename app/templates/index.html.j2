@@ -424,21 +424,18 @@
                 <a class="see-more" href="{{ url_for('program_schedule') }}">【查看更多>】</a>
             </div>
             <div class="program-list">
-                <div class="program-item" data-section="program-schedule" data-group="1">
-                    <img src="{{ image_url + 'ik1.jpg' }}"
-                         alt="節目1">
-                    <div class="program-item-content">節目 1</div>
-                </div>
-                <div class="program-item" data-section="program-schedule" data-group="1">
-                    <img src="{{ url_for('static', filename='app/images/ik2.jpg') }}"
-                         alt="節目2">
-                    <div class="program-item-content">節目 2</div>
-                </div>
-                <div class="program-item" data-section="program-schedule" data-group="1">
-                    <img src="{{ url_for('static', filename='app/images/ik3.jpg') }}"
-                         alt="節目3">
-                    <div class="program-item-content">節目 3</div>
-                </div>
+                {% for content in contents %}
+                    <div class="program-item" data-section="program-schedule" data-group="1">
+                        <img src="{{ content.image_path }}" alt="{{ content.title }}">
+                        <div class="program-item-content">
+                            <h3>{{ content.title }}</h3>
+                            <p>
+                                {{ content.description[:50] }}
+                                {% if content.description|length > 50 %}...{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
         </div>
         {# 娛樂焦點 #}
@@ -470,17 +467,26 @@
                          alt="焦點3">
                     <div class="program-item-content">焦點 3</div>
                 </div>
-                <div class="program-item" data-section="entertainment" data-group="2" style="display:none;">
+                <div class="program-item"
+                     data-section="entertainment"
+                     data-group="2"
+                     style="display:none">
                     <img src="{{ url_for('static', filename='app/images/ik7.jpg') }}"
                          alt="焦點4">
                     <div class="program-item-content">焦點 4</div>
                 </div>
-                <div class="program-item" data-section="entertainment" data-group="2" style="display:none;">
+                <div class="program-item"
+                     data-section="entertainment"
+                     data-group="2"
+                     style="display:none">
                     <img src="{{ url_for('static', filename='app/images/ik8.jpg') }}"
                          alt="焦點5">
                     <div class="program-item-content">焦點 5</div>
                 </div>
-                <div class="program-item" data-section="entertainment" data-group="2" style="display:none;">
+                <div class="program-item"
+                     data-section="entertainment"
+                     data-group="2"
+                     style="display:none">
                     <img src="{{ url_for('static', filename='app/images/ik9.jpg') }}"
                          alt="焦點6">
                     <div class="program-item-content">焦點 6</div>
@@ -509,7 +515,10 @@
                     </div>
                 {% endfor %}
                 {% for program in programs[3:6] %}
-                    <div class="program-item" data-section="popular" data-group="2" style="display:none;">
+                    <div class="program-item"
+                         data-section="popular"
+                         data-group="2"
+                         style="display:none">
                         <img src="{{ url_for('static', filename='app/images/' + program.image) }}"
                              alt="{{ program.name }}"
                              onerror="this.src='{{ url_for("static", filename="app/images/default.jpg") }}'">
@@ -517,7 +526,10 @@
                     </div>
                 {% endfor %}
                 {% for program in programs[6:] %}
-                    <div class="program-item" data-section="popular" data-group="3" style="display:none;">
+                    <div class="program-item"
+                         data-section="popular"
+                         data-group="3"
+                         style="display:none">
                         <img src="{{ url_for('static', filename='app/images/' + program.image) }}"
                              alt="{{ program.name }}"
                              onerror="this.src='{{ url_for("static", filename="app/images/default.jpg") }}'">
@@ -554,17 +566,26 @@
                          alt="懶人包3">
                     <div class="program-item-content">懶人包 3</div>
                 </div>
-                <div class="program-item" data-section="summaries" data-group="2" style="display:none;">
+                <div class="program-item"
+                     data-section="summaries"
+                     data-group="2"
+                     style="display:none">
                     <img src="{{ url_for('static', filename='app/images/ik7.jpg') }}"
                          alt="懶人包4">
                     <div class="program-item-content">懶人包 4</div>
                 </div>
-                <div class="program-item" data-section="summaries" data-group="2" style="display:none;">
+                <div class="program-item"
+                     data-section="summaries"
+                     data-group="2"
+                     style="display:none">
                     <img src="{{ url_for('static', filename='app/images/ik8.jpg') }}"
                          alt="懶人包5">
                     <div class="program-item-content">懶人包 5</div>
                 </div>
-                <div class="program-item" data-section="summaries" data-group="2" style="display:none;">
+                <div class="program-item"
+                     data-section="summaries"
+                     data-group="2"
+                     style="display:none">
                     <img src="{{ url_for('static', filename='app/images/ik9.jpg') }}"
                          alt="懶人包6">
                     <div class="program-item-content">懶人包 6</div>
@@ -599,17 +620,26 @@
                          alt="明珠節目3">
                     <div class="program-item-content">明珠節目 3</div>
                 </div>
-                <div class="program-item" data-section="pearl" data-group="2" style="display:none;">
+                <div class="program-item"
+                     data-section="pearl"
+                     data-group="2"
+                     style="display:none">
                     <img src="{{ url_for('static', filename='app/images/ik10.jpg') }}"
                          alt="明珠節目4">
                     <div class="program-item-content">明珠節目 4</div>
                 </div>
-                <div class="program-item" data-section="pearl" data-group="2" style="display:none;">
+                <div class="program-item"
+                     data-section="pearl"
+                     data-group="2"
+                     style="display:none">
                     <img src="{{ url_for('static', filename='app/images/ik1.jpg') }}"
                          alt="明珠節目5">
                     <div class="program-item-content">明珠節目 5</div>
                 </div>
-                <div class="program-item" data-section="pearl" data-group="2" style="display:none;">
+                <div class="program-item"
+                     data-section="pearl"
+                     data-group="2"
+                     style="display:none">
                     <img src="{{ url_for('static', filename='app/images/ik2.jpg') }}"
                          alt="明珠節目6">
                     <div class="program-item-content">明珠節目 6</div>
@@ -644,17 +674,26 @@
                          alt="930節目3">
                     <div class="program-item-content">930節目 3</div>
                 </div>
-                <div class="program-item" data-section="pearl930" data-group="2" style="display:none;">
+                <div class="program-item"
+                     data-section="pearl930"
+                     data-group="2"
+                     style="display:none">
                     <img src="{{ url_for('static', filename='app/images/ik3.jpg') }}"
                          alt="930節目4">
                     <div class="program-item-content">930節目 4</div>
                 </div>
-                <div class="program-item" data-section="pearl930" data-group="2" style="display:none;">
+                <div class="program-item"
+                     data-section="pearl930"
+                     data-group="2"
+                     style="display:none">
                     <img src="{{ url_for('static', filename='app/images/ik4.jpg') }}"
                          alt="930節目5">
                     <div class="program-item-content">930節目 5</div>
                 </div>
-                <div class="program-item" data-section="pearl930" data-group="2" style="display:none;">
+                <div class="program-item"
+                     data-section="pearl930"
+                     data-group="2"
+                     style="display:none">
                     <img src="{{ url_for('static', filename='app/images/ik5.jpg') }}"
                          alt="930節目6">
                     <div class="program-item-content">930節目 6</div>

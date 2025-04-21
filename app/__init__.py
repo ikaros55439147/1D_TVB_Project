@@ -3,6 +3,7 @@ from logging.handlers import RotatingFileHandler, SMTPHandler
 import os
 from flask import Flask, request,redirect  
 from app.config import Config,AWSConfig
+from flask import Flask,render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -11,6 +12,10 @@ from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_babel import Babel
 from flask_s3 import FlaskS3
+# from flask_admin import Admin, expose, BaseView
+
+
+
 
 
 
@@ -30,6 +35,14 @@ moment = Moment(app)
 babel = Babel(app)
 # from datetime import datetime
 
+
+# class adminindex(BaseView):
+#     @expose('/') # 用法等於路由
+#     def index(self):
+#         return render_template('mo.html') # 導入自己的網頁
+# # 增加欄位     自訂類    欄位名稱
+# admin = Admin(app, name='My Admin', template_mode='bootstrap3')  # 初始化 Admin
+# admin.add_view(adminindex(name='後台第一欄'))
 
 
 @app.route('/asset/<path:filename>')
