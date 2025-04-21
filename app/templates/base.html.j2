@@ -295,9 +295,15 @@
 
     <script>
         function toggleLoginModal() {
-            // 這裡可以用來彈出登入界面或進入個人頁面
-            alert('Toggle login/modal functionality here!');
-        }
+    // 後端渲染變數（Flask/Jinja2 示例）
+    const isAuthenticated = {{ 'true' if current_user.is_authenticated else 'false' }};
+    
+    if (isAuthenticated) {
+        window.location.href = "{{ url_for('profile') }}";
+    } else {
+        window.location.href = "{{ url_for('login') }}";
+    }
+}
     </script>
     
 {% endblock %}

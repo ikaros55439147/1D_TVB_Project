@@ -6,19 +6,27 @@ from flask_babel import _, get_locale
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, PostForm, \
     ResetPasswordRequestForm, ResetPasswordForm,NewsSearchForm
-from app.models import User, Post,News, NewsCategory
+from app.models import User, Post,News, NewsCategory,Content
 from app.email import send_password_reset_email
 # from utils.s3_upload import upload_to_s3
 from flask_s3 import FlaskS3
 import boto3
-from botocore.exceptions import NoCredentialsError
+from botocore.exceptions import NoCredentialsError,ClientError
 from urllib.parse import urlparse
 import os
 from app.config import AWSConfig
 from werkzeug.utils import secure_filename
-from botocore.exceptions import NoCredentialsError
 import hashlib
+from sqlalchemy.exc import IntegrityError  # 处理数据库完整性错误
+from sqlalchemy.orm import validates  
+import uuid
 
+s3_client = boto3.client('s3', region_name='ap-east-1') 
+
+
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.before_request
 def before_request():
@@ -28,10 +36,9 @@ def before_request():
     g.locale = str(get_locale())
 
 
-@app.route('/', methods=['GET', 'POST'])
-@app.route('/index', methods=['GET', 'POST'])
+@app.route('/profile', methods=['GET', 'POST'])
 @login_required
-def index():
+def profile():
     form = PostForm()
     if form.validate_on_submit():
         post = Post(body=form.post.data, author=current_user)
@@ -46,9 +53,22 @@ def index():
         'index', page=posts.next_num) if posts.next_num else None
     prev_url = url_for(
         'index', page=posts.prev_num) if posts.prev_num else None
+    return render_template('profile.html.j2', title=_('Home'), form=form,
+                           posts=posts.items, next_url=next_url,
+                           prev_url=prev_url)
+
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
+
+
+
+def index():
+    
     programs = get_program_data()
     image_key = 'images/'
     image_url = f"https://{AWSConfig.S3_BUCKET}.s3.{AWSConfig.AWS_REGION}.amazonaws.com/{image_key}"
+    contents = Content.query.order_by(Content.created_at.desc()).limit(4).all()
     
 
     carousel_items = [
@@ -60,9 +80,8 @@ def index():
     
 
     return render_template('index.html.j2', carousel_items=carousel_items,
-                        ikaros=("主标题", "副标题"),title=_('Home'), form=form,
-                           posts=posts.items, next_url=next_url,
-                           prev_url=prev_url, programs=programs,image_url=image_url)
+                        ikaros=("主标题", "副标题"),title=_('Home'), 
+                           programs=programs,image_url=image_url,contents=contents)
 
 
 @app.route('/explore')
@@ -575,3 +594,89 @@ def time_ago_filter(dt):
 
 # 註冊過濾器
 app.jinja_env.filters['time_ago'] = time_ago_filter
+
+
+@app.route('/admin')
+def admin():
+    contents = Content.query.order_by(Content.created_at.desc()).all()
+    return render_template('admin.html.j2', contents=contents)
+
+@app.route('/create-content', methods=['POST'])
+def create_content():
+    try:
+        # 獲取表單數據
+        title = request.form.get('title', '').strip()
+        description = request.form.get('description', '').strip()
+        image = request.files.get('image')
+
+        # 驗證必填字段
+        if not all([title, description, image]):
+            flash('所有字段均为必填项', 'danger')
+            return redirect(url_for('admin'))
+
+        # 驗證圖片
+        if not allowed_file(image.filename):
+            flash('僅支持 JPG/PNG 格式的圖片', 'danger')
+            return redirect(url_for('admin'))
+
+        # 生成唯一文件名並上傳S3
+        file_ext = secure_filename(image.filename).rsplit('.', 1)[1].lower()
+        unique_filename = f"{uuid.uuid4().hex}.{file_ext}"
+        s3_key = f"uploads/{unique_filename}"
+
+        s3_client.upload_fileobj(
+            image,
+            app.config['S3_BUCKET'],
+            s3_key,
+            ExtraArgs={
+                'ContentType': image.content_type,
+                'ACL': 'public-read'
+            }
+        )
+
+        # 構建S3公開URL
+        s3_url = f"https://mytvbprojectbucket-1.s3.ap-east-1.amazonaws.com/{s3_key}"
+
+        # 創建數據庫記錄
+        new_content = Content(
+            title=title,
+            description=description,
+            image_path=s3_url
+        )
+
+        db.session.add(new_content)
+        db.session.commit()
+        flash('內容新增成功！', 'success')
+
+    except IntegrityError:
+        db.session.rollback()
+        flash('標題已存在，請使用唯一標題', 'danger')
+    except ClientError as e:
+        db.session.rollback()
+        app.logger.error(f"S3上傳失敗: {e}")
+        flash('文件上傳失敗，請檢查權限或稍後再試', 'danger')
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"系統錯誤: {e}")
+        flash('系統錯誤，請稍後再試', 'danger')
+
+    return redirect(url_for('admin'))
+
+@app.route('/delete-content/<int:id>', methods=['POST'])
+def delete_content(id):
+    content = Content.query.get_or_404(id)
+    try:
+        # 從S3刪除文件（可選）
+        # s3_client.delete_object(Bucket=app.config['S3_BUCKET'], Key=...)
+        
+        db.session.delete(content)
+        db.session.commit()
+        flash('內容已刪除', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash('刪除失敗', 'danger')
+    return redirect(url_for('admin'))
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

@@ -1,0 +1,159 @@
+{% extends "base.html.j2" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">內容管理</h2>
+    
+    {# Flash消息显示 #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {# 上傳表單 #}
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">新增內容</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('create_content') }}" class="needs-validation" novalidate>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="title" class="form-label">標題：</label>
+                        <input type="text" class="form-control" 
+                               id="title" name="title" 
+                               required
+                               minlength="3"
+                               maxlength="100">
+                        <div class="invalid-feedback">
+                            請輸入3-100個字符的標題
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label for="image" class="form-label">圖片：</label>
+                        <input type="file" class="form-control" 
+                               id="image" name="image" 
+                               accept="image/jpeg,image/png"
+                               required>
+                        <div class="invalid-feedback">
+                            請選擇有效的JPEG/PNG圖片
+                        </div>
+                    </div>
+                    
+                    <div class="col-12">
+                        <label for="description" class="form-label">描述：</label>
+                        <textarea class="form-control" 
+                                  id="description" name="description" 
+                                  rows="3"
+                                  required
+                                  minlength="10"
+                                  maxlength="500"></textarea>
+                        <div class="invalid-feedback">
+                            請輸入10-500個字符的描述
+                        </div>
+                    </div>
+                    
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-upload me-2"></i>上傳內容
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# 內容列表 #}
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">現有內容列表</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th width="100">預覽圖</th>
+                            <th>標題</th>
+                            <th>描述</th>
+                            <th width="150">創建時間</th>
+                            <th width="120">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for content in contents %}
+                        <tr>
+                            <td>
+                                <img src="{{ content.image_path }}" 
+                                     alt="{{ content.title }}" 
+                                     class="img-thumbnail" 
+                                     style="width:80px; height:auto;">
+                            </td>
+                            <td>{{ content.title }}</td>
+                            <td>
+                                <div class="text-truncate" style="max-width: 300px;">
+                                    {{ content.description }}
+                                </div>
+                            </td>
+                            <td>{{ content.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                <a href="{{ url_for('delete_content', id=content.id) }}" 
+                                   class="btn btn-sm btn-outline-primary me-1">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form action="{{ url_for('delete_content', id=content.id) }}" 
+                                      method="POST" 
+                                      class="d-inline"
+                                      onsubmit="return confirm('確定要刪除這項內容嗎？');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">暫無內容</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 前端驗證增強
+document.addEventListener('DOMContentLoaded', () => {
+    // 文件大小驗證 (2MB限制)
+    document.getElementById('image').addEventListener('change', function(e) {
+        const maxSize = 2 * 1024 * 1024; // 2MB
+        if (this.files[0] && this.files[0].size > maxSize) {
+            this.setCustomValidity(`文件大小超過 ${maxSize/1024/1024}MB 限制`);
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
+    // Bootstrap表單驗證
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+});
+</script>
+{% endblock %}
