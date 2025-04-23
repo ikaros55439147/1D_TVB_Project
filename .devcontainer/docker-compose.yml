@@ -10,7 +10,11 @@ services:
         NODE_VERSION: "none"
     volumes:
       - ..:/workspace:cached
-    command: sleep infinity
+    environment:
+      FLASK_APP: "app"
+      FLASK_DEBUG: "1"
+      PYTHONPATH: "/workspace"
+    command: flask run --host=0.0.0.0 --port=5000
     networks:
       - flask_app
     ports:
@@ -54,9 +58,9 @@ services:
   mailhog:
     image: mailhog/mailhog
     logging:
-      driver: 'none' # disable saving logs
+      driver: 'json-file' # disable saving logs
     ports:
-      - 1025:1025 # smtp server
+      - 51025:1025 # smtp server
       - 8025:8025 # web ui
     networks:
       - flask_app
